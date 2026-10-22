@@ -1,24 +1,27 @@
-# EDI Claim Data Parser
+# Healthcare EDI Claims Parser & SQL Analytics Pipeline
 
-## Overview
-A lightweight Python script built to parse raw, unstructured X12 EDI electronic claim files. This project automates the extraction of key healthcare billing data—specifically targeting claim IDs and total charge amounts—without relying on manual entry or heavy external libraries.
+## Executive Summary
+A mini-ETL (Extract, Transform, Load) pipeline that automates the processing of raw, unstructured X12 EDI healthcare claims data. The pipeline uses a custom Python script to parse raw text streams, extracts claim identifiers and total charge amounts into a structured dataset, loads the records into a local SQLite relational database, and executes SQL queries to aggregate financial batch metrics.
 
-## Problem Solved
-Healthcare billing logs and electronic data interchange (EDI) files are typically delivered as massive, unformatted text files. Reviewing these logs manually to check claim details is tedious and inefficient. This script uses custom Python string-parsing logic to ingest the raw text, segment the data, and extract essential financial records instantly.
+## The Problem Solved
+Healthcare billing logs and electronic data interchange (EDI) files are typically delivered as massive, unformatted X12 text files. Reviewing these logs manually to check claim details is tedious and error-prone. This project automates the extraction and database ingestion of claim records, making batch metrics instantly queryable.
 
-## Tech Stack & Skills Demonstrated
-* **Language:** Python
-* **Core Concepts:** File handling (`open`), string splitting (`.split()`), conditional logic (`if/else`), and data de-serialization.
+## Technical Stack & Skills Demonstrated
+* **Programming & Libraries:** Python, Pandas, SQLite (`sqlite3`), `os` file pathing
+* **Database & Querying:** Relational Database Design, SQL Aggregations (`COUNT`, `SUM`)
+* **Core Analytics Skills:** File Parsing, Data De-Serialization, Exception Handling, Data Pipeline Automation
 
-## How the Script Works
-1. **File Ingestion:** Securely opens and reads the raw text file using Python context managers.
-2. **Segment Splitting:** Breaks the continuous text wall into individual data segments using the standard X12 tilde (`~`) delimiter.
-3. **Element Parsing:** Loops through each segment, splits by asterisks (`*`), and isolates specific indices to pull claim IDs and charges.
-4. **Output:** Prints the extracted metrics cleanly to the terminal.
+## Pipeline Architecture & Workflow
+1. **Extraction (Python):** Ingests raw X12 EDI text logs (`sample_edi_batch.txt`), using custom string-splitting rules to isolate segment markers (`~`) and element delimiters (`*`).
+2. **Transformation (Pandas):** Filters for claim segments (`CLM`), extracts Claim IDs and financial charges, and structures records into a clean Pandas DataFrame exported as a CSV.
+3. **Loading (SQLite):** Connects to a local SQLite database (`claims.db`) and creates a structured relational table (`claims`).
+4. **Querying (SQL):** Runs SQL query scripts to calculate batch metrics, including total claims processed and total financial charges.
 
-## How to Run This Project
+## How to Run
 1. Clone or download this repository.
-2. Ensure you have Python installed.
-3. Run the parser script in your terminal:
+2. Ensure Python and Pandas are installed (`py -m pip install pandas`).
+3. Run the scripts in sequence:
    ```bash
-   py edi_parser.py
+   py edi_parser.py   # Parses raw text and creates CSV
+   py load_db.py      # Ingests CSV into SQLite database
+   py query_db.py     # Executes SQL queries and prints batch results
